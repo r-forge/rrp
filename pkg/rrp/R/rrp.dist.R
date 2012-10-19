@@ -65,13 +65,21 @@ RRP.rpart <- function (formula,  data, weights, subset, na.action = na.rpart,
         else is.ordered(x)
     }
     isord <- unlist(lapply(m[attr(Terms, "term.labels")], tfun))
-    rpfit <- .C("s_to_rp", n = as.integer(nobs), nvarx = as.integer(nvar), 
-        ncat = as.integer(cats * (!isord)), method = as.integer(method.int), 
-        as.double(unlist(controls)), parms = as.double(unlist(init$parms)), 
-        as.integer(xval), as.integer(xgroups), as.double(t(init$y)), 
-        as.double(RRPX), as.integer(!is.finite(RRPX)), error = character(1), 
-        wt = as.double(wt), as.integer(init$numy), as.double(cost), 
-        NAOK = TRUE, PACKAGE="rpart")
+    rpfit <- .C(rpart:::C_s_to_rp, n = as.integer(nobs), nvarx = as.integer(nvar),
+    ncat = as.integer(cats * (!isord)), method = as.integer(method.int),
+    as.double(unlist(controls)), parms = as.double(unlist(init$parms)),
+    as.integer(xval), as.integer(xgroups), as.double(t(init$y)),
+    as.double(RRPX), as.integer(!is.finite(RRPX)), error = character(1),
+    wt = as.double(wt), as.integer(init$numy), as.double(cost),
+    NAOK = TRUE)
+
+    #rpfit <- .C("s_to_rp", n = as.integer(nobs), nvarx = as.integer(nvar),
+    #   ncat = as.integer(cats * (!isord)), method = as.integer(method.int),
+    #   as.double(unlist(controls)), parms = as.double(unlist(init$parms)),
+    #   as.integer(xval), as.integer(xgroups), as.double(t(init$y)),
+    #   as.double(RRPX), as.integer(!is.finite(RRPX)), error = character(1),
+    #   wt = as.double(wt), as.integer(init$numy), as.double(cost),
+    #   NAOK = TRUE, PACKAGE="rpart")
     if (rpfit$n == -1) 
         stop(rpfit$error)
     nodes <- rpfit$n
